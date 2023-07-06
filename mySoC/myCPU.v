@@ -32,9 +32,6 @@ module myCPU (
     wire [31:0]offset;
 
     wire [31:0]pc4;
-    wire [4:0]rR1;
-    wire [4:0]rR2;
-    wire [4:0]wR;
     wire [31:0]wD;
     wire [31:0]rD1;
     wire [31:0]ext;
@@ -78,9 +75,9 @@ module myCPU (
     );
     
     RF rf(
-    .rR1(rR1),
-.rR2(rR2),
-.wR(wR),
+    .rR1(inst[19:15]),
+.rR2(inst[24:20]),
+.wR(inst[11:7]),
 .wD(wD),
 .clk_i(cpu_clk),
 .rst_i(cpu_rst),
@@ -141,7 +138,7 @@ module myCPU (
     assign debug_wb_have_inst = Bus_wen;
     assign debug_wb_pc        = inst_addr;
     assign debug_wb_ena       = rf_we;
-    assign debug_wb_reg       = wR;
+    assign debug_wb_reg       = inst[11:7];
     assign debug_wb_value     = Bus_wdata;
 `endif
 
