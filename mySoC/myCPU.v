@@ -65,7 +65,7 @@ module myCPU (
     
     NPC myNPC(
     .pc(inst_addr),
-.offset(offset),
+.offset(ext),
 .br(f),
 .op(npc_op),
 .npc(npc2pc),
@@ -100,13 +100,15 @@ module myCPU (
     MUX2 alua(
     .i1(inst_addr),
     .i2(rD1),
-    .o(A)
+    .o(A),
+    .sel(alua_sel)
     );
     
      MUX2 alub(
     .i1(ext),
     .i2(Bus_wdata),
-    .o(B)
+    .o(B),
+    .sel(alub_sel)
     );
     
     MUX4 mux4rf(
