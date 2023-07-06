@@ -40,6 +40,7 @@ module myCPU (
     wire [31:0] B;
     wire [31:0] C;
     wire f;
+    assign Bus_addr=C;
     
     
     wire [1:0]npc_op;
