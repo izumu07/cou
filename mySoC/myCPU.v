@@ -119,7 +119,7 @@ module myCPU (
     );
 
     
-    CONTROLER(
+    CONTROLER controler(
 .opcode(inst[6:0]),
 .funct3(inst[14:12]),
 .funct7(inst[31:25]),

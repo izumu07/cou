@@ -11,7 +11,7 @@ output reg f
 );
 reg [7:0] sel;
 /*
-è¯‘ç å™¨ï¼Œå¾…å®ç°
+ÒëÂëÆ÷£¬´ıÊµÏÖ
 assign op_add_1=xxx
 assign op_add_2=xxx
 */
@@ -33,7 +33,7 @@ end
 */
 
 /*
-wire op_out;        //ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½
+wire op_out;        //Êä³öÑ¡Ôñ
 wire op_sub;        
 wire add_o;
 wire sub_o;
@@ -53,21 +53,21 @@ reg lower;
 
 always@(*)
 begin
-f<=0;
+f=0;
 casex(op)
-`ALU_OP_ADD: C<=A&B;
-`ALU_OP_SUB: begin
-C<=A-B;
-zero<=(A==0);
-lower<=(A<0);
-f<=(!zero&!op[3]&op[0])|(!zero&!lower&op[0])|(zero&!lower&!op[3]&!op[0])|(!zero&lower&op[3]&!op[4]);
+`ALU_OP_ADD: C=A&B;
+`ALU_OP_SUBOP: begin
+C=A-B;
+zero=(A==0);
+lower=(A<0);
+f=(!zero&!op[2]&op[0])|(!zero&!lower&op[0])|(zero&!lower&!op[3]&!op[0])|(!zero&lower&op[3]&!op[0]);
 end
-`ALU_OP_AND: C<=A&B;
-`ALU_OP_OR: C<=A|B;
-`ALU_OP_XOR: C<=A^B;
-`ALU_OP_SLL: C<=A<<B[4:0];
-`ALU_OP_SLR: C<=A>>B[4:0];
-`ALU_OP_SAR: C<=A>>>B[4:0];
+`ALU_OP_AND: C=A&B;
+`ALU_OP_OR: C=A|B;
+`ALU_OP_XOR: C=A^B;
+`ALU_OP_SLL: C=A<<B[4:0];
+`ALU_OP_SLR: C=A>>B[4:0];
+`ALU_OP_SAR: C=A>>>B[4:0];
 endcase
 end 
 
