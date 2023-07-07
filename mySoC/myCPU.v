@@ -29,12 +29,15 @@ module myCPU (
     // TODO: 完成你自己的单周期CPU设计
     //
     wire [31:0]npc2pc;
-    wire [31:0]offset;
-
+    wire [31:0]rD2;
     wire [31:0]pc4;
+    wire [31:0]pc;
     wire [31:0]wD;
     wire [31:0]rD1;
     wire [31:0]ext;
+    wire ram_we;
+    wire [31:0]rdo;
+    assign rdo=Bus_rdata;
     
     wire [31:0] A;
     wire [31:0] B;
@@ -47,7 +50,7 @@ module myCPU (
     wire [2:0]sext_op;
     wire rf_we;
     wire [3:0] alu_op;
-    wire rf_wsel;
+    wire [1:0]rf_wsel;
     wire alua_sel;
     wire alub_sel;
     
@@ -58,20 +61,21 @@ module myCPU (
 .din(npc2pc),
 .clk_i(cpu_clk),
 .rst_i(cpu_rst),
-.pc(inst_addr)
+.pc(pc)
     );
     
     NPC myNPC(
-    .pc(inst_addr),
+    .pc(pc),
 .offset(ext),
 .br(f),
+.C(C),
 .op(npc_op),
 .npc(npc2pc),
 .pc4(pc4));
 
     SEXT sext(
     .op(sext_op),
-.din(inst),
+.din(inst[31:7]),
 .ext(ext)
     );
     
@@ -84,7 +88,7 @@ module myCPU (
 .rst_i(cpu_rst),
 .op(rf_we),
 .rD1(rD1),
-.rD2(Bus_wdata)
+.rD2(rD2)
     );
     
     ALU alu(
@@ -96,7 +100,7 @@ module myCPU (
     );
     
     MUX2 alua(
-    .i1(inst_addr),
+    .i1(pc),
     .i2(rD1),
     .o(A),
     .sel(alua_sel)
@@ -104,16 +108,16 @@ module myCPU (
     
      MUX2 alub(
     .i1(ext),
-    .i2(Bus_wdata),
+    .i2(rD2),
     .o(B),
     .sel(alub_sel)
     );
     
     MUX4 mux4rf(
-    .i1(C),
-    .i2(ext),
-    .i3(pc4),
-    .i4(Bus_rdata),
+    .i1(rdo),
+    .i2(pc4),
+    .i3(C),
+    .i4(ext),
     .op(rf_wsel),
     .o(wD)
     );
@@ -125,7 +129,7 @@ module myCPU (
 .funct7(inst[31:25]),
 .npc_op(npc_op),
 .rf_wsel(rf_wsel),
-.ram_we(Bus_wen),
+.ram_we(ram_we),
 .alu_op(alu_op),
 .alua_sel(alua_sel),
 .alub_sel(alub_sel),
@@ -133,14 +137,17 @@ module myCPU (
 .rf_we(rf_we) 
     );
     
+    assign inst_addr=pc;
+    assign Bus_wdata=rD2;
+    assign Bus_wen=ram_we;
 
 `ifdef RUN_TRACE
     // Debug Interface
-    assign debug_wb_have_inst = Bus_wen;
-    assign debug_wb_pc        = inst_addr;
+    assign debug_wb_have_inst = 1;
+    assign debug_wb_pc        = pc;
     assign debug_wb_ena       = rf_we;
     assign debug_wb_reg       = inst[11:7];
-    assign debug_wb_value     = Bus_wdata;
+    assign debug_wb_value     = wD;
 `endif
 
 endmodule

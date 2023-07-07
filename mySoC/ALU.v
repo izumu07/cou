@@ -55,7 +55,7 @@ always@(*)
 begin
 f=0;
 casex(op)
-`ALU_OP_ADD: C=A&B;
+`ALU_OP_ADD: C=A+B;
 `ALU_OP_SUBOP: begin
 C=A-B;
 zero=(A==0);
