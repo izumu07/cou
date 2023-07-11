@@ -25,7 +25,7 @@ begin
         2'b10:npc=pc+4;
         2'b00:begin
             if(br)
-                npc=pc+offset;
+                npc=pc+{{20{offset[12]}},offset[11:0]};
             else
                 npc=pc+4;
             end
