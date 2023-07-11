@@ -20,10 +20,10 @@ end
 always@(*)
 begin
     case(op)
-        2'b00:npc=pc+offset;
+        2'b11:npc=pc+offset;
         2'b01:npc=C;
         2'b10:npc=pc+4;
-        2'b11:begin
+        2'b00:begin
             if(br)
                 npc=pc+offset;
             else
