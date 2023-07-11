@@ -20,8 +20,6 @@
 `define ALU_OP_SLR   4'b0101
 `define ALU_OP_SAR   4'b1101
 
-`define ALU_OP_ADDI  4'b1111
-
 `define ALU_OP_BEQ   4'b0010
 `define ALU_OP_BNE   4'b0011
 `define ALU_OP_BLT   4'b1010
