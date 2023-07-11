@@ -61,7 +61,7 @@ module ALU(
       begin
         C=A-B;
         zero=(C==0);
-        lower=(C<0);
+        lower=(A<B);
         f=(zero&!op[3]&!op[0])|(!lower&op[3]&op[0])|(!zero&!op[3]&op[0])|(lower&op[3]&!op[0]);
       end
       `ALU_OP_AND:
