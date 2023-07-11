@@ -62,7 +62,7 @@ module ALU(
         C=A-B;
         zero=(C==0);
         lower=(C<0);
-        f=(!zero&!op[2]&op[0])|(!zero&!lower&op[0])|(zero&!lower&!op[3]&!op[0])|(!zero&lower&op[3]&!op[0]);
+        f=(!zero&!op[3]&op[0])|(!zero&!lower&op[0])|(zero&!lower&!op[3]&!op[0])|(!zero&lower&op[3]&!op[0]);
       end
       `ALU_OP_AND:
         C=A&B;
@@ -79,8 +79,6 @@ module ALU(
         //C={A[31],C[30:0]};
         C=( { {31{A[31]}}, 1'b0 } << (~B[4:0]) ) | ( A >> B[4:0] ) ;
       //C= ( {32{A[31]}} << ( 6'd32 - {1'b0, B[4:0]} ) ) | ( A >> B[4:0] ) ;
-      `ALU_OP_ADDI:
-        C=A+{{20{B[11]}},B[11:0]};
     endcase
   end
 
