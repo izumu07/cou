@@ -40,7 +40,7 @@ output rf_we
     assign rf_wsel={opcode[4],opcode[2]};
     
     //ram_we
-    assign ram_we=!funct7[6]&funct7[5]&!funct7[4];
+    assign ram_we=!opcode[6]&opcode[5]&!opcode[4];
     
     //alu_op
     assign alu_op=(opcode[6]&opcode[5]&!opcode[2])?{funct3[2:1],1'b1,funct3[0]}:(opcode[4]?((funct3==3'b000)?{funct3[2:1],funct7[5]&opcode[5],funct3[0]}:((funct3==3'b101)?{funct7[5],funct3}:{1'b0,funct3})):4'b0000); 
