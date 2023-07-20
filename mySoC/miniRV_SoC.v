@@ -21,11 +21,11 @@ module miniRV_SoC (
 
 `ifdef RUN_TRACE
     ,// Debug Interface
-    output wire         debug_wb_have_inst, // 当前时钟周期是否有指令写�? (对单周期CPU，可在复位后恒置1)
-    output wire [31:0]  debug_wb_pc,        // 当前写回的指令的PC (若wb_have_inst=0，此项可为任意�??)
-    output              debug_wb_ena,       // 指令写回时，寄存器堆的写使能 (若wb_have_inst=0，此项可为任意�??)
-    output wire [ 4:0]  debug_wb_reg,       // 指令写回时，写入的寄存器�? (若wb_ena或wb_have_inst=0，此项可为任意�??)
-    output wire [31:0]  debug_wb_value      // 指令写回时，写入寄存器的�? (若wb_ena或wb_have_inst=0，此项可为任意�??)
+    output wire         debug_wb_have_inst, // 当前时钟周期是否有指令写�? (对单周期CPU，可在复位后恒置1)
+    output wire [31:0]  debug_wb_pc,        // 当前写回的指令的PC (若wb_have_inst=0，此项可为任意�??)
+    output              debug_wb_ena,       // 指令写回时，寄存器堆的写使能 (若wb_have_inst=0，此项可为任意�??)
+    output wire [ 4:0]  debug_wb_reg,       // 指令写回时，写入的寄存器�? (若wb_ena或wb_have_inst=0，此项可为任意�??)
+    output wire [31:0]  debug_wb_value      // 指令写回时，写入寄存器的�? (若wb_ena或wb_have_inst=0，此项可为任意�??)
 `endif
 );
 
@@ -56,7 +56,7 @@ module miniRV_SoC (
     wire [31:0]  wdata_bridge2dram;
     
     // Interface between bridge and peripherals
-    // TODO: 在此定义总线桥与外设I/O接口电路模块的连接信�?
+    // TODO: 在此定义总线桥与外设I/O接口电路模块的连接信�?
     //
      // Interface to 7-seg digital LEDs
         wire rst_bridge2dig;
@@ -175,7 +175,7 @@ module miniRV_SoC (
     );
 
     //wire [13:0] waddr_tmp = addr_bridge2dram[15:2] - 16'h4000;
-    wire [15:0] waddr_tmp = addr_bridge2dram[15:0] - 16'h4000;
+    wire [15:0] waddr_tmp = addr_bridge2dram[15:0];// - 16'h4000;
     DRAM Mem_DRAM (
         .clk        (clk_bridge2dram),
         .a          (waddr_tmp[15:2]),

@@ -26,7 +26,7 @@ module myCPU (
 `endif
   );
 
-  // TODO: 完成你自己的单周期CPU设计
+  // TODO: 瀹屾垚浣犺嚜宸辩殑鍗曞懆鏈烠PU璁捐
   //
   wire [31:0]npc2pc;
   wire [31:0]rD2;
@@ -55,7 +55,20 @@ module myCPU (
   wire alub_sel;
 
 
+  wire [31:0]pc4_id;
+  wire [31:0]inst_id;
+  wire [31:0]pc_id;
 
+
+wire [1:0]rf_wsel_ex;
+wire [1:0]npc_op_ex;
+wire ram_we_ex;
+wire[3:0] alu_op_ex;
+wire[31:0] A_ex;
+wire [31:0]B_ex;
+wire[31:0] ext_ex;
+wire  [31:0]rD1_ex;
+wire [31:0]rD2_ex;
 
   PC U_PC(
        .din(npc2pc),
@@ -66,23 +79,34 @@ module myCPU (
 
   NPC U_NPC(
         .pc(pc),
-        .offset(ext),
+        .offset(ext_ex),
         .br(f),
         .C(C),
-        .op(npc_op),
+        .op(npc_op_ex),
         .npc(npc2pc),
         .pc4(pc4));
 
+  IF if_id(
+       .clk_i(cpu_clk),
+       .rst_i(cpu_rst),
+       .pc4_i(pc4),
+       .inst_i(inst),
+       .pc_i(pc),
+       .pc4_o(pc4_id),
+       .inst_o(inst_id),
+       .pc_o(pc_id)
+     );
+
   SEXT U_sext(
          .op(sext_op),
-         .din(inst[31:7]),
+         .din(inst_id[31:7]),
          .ext(ext)
        );
 
   RF U_rf(
-       .rR1(inst[19:15]),
-       .rR2(inst[24:20]),
-       .wR(inst[11:7]),
+       .rR1(inst_id[19:15]),
+       .rR2(inst_id[24:20]),
+       .wR(inst_id[11:7]),
        .wD(wD),
        .clk_i(cpu_clk),
        .rst_i(cpu_rst),
@@ -90,17 +114,69 @@ module myCPU (
        .rD1(rD1),
        .rD2(rD2)
      );
+    
+
+  
+     
+  ID id_ex(
+.clk_i(cpu_clk),
+.rst_i(cpu_rst),
+.npc_op_i(npc_op),
+.ram_we_i(ram_we),
+.rf_wsel_i(rf_wsel),
+.alu_op_i(alu_op),
+.alua_i(A),
+.alub_i(B),
+.ext_i(ext),
+.rD2_i(rD2),
+.npc_op_o(npc_op_ex),
+.ram_we_o(ram_we_ex),
+.rf_wsel_o(rf_wsel_ex),
+.alu_op_o(alu_op_ex),
+.alua_o(A_ex),
+.alub_o(B_ex),
+.ext_o(ext_ex),
+.rD2_o(rD2_ex)
+  );
 
   ALU U_alu(
-        .A(A),
-        .B(B),
-        .op(alu_op),
+        .A(A_ex),
+        .B(B_ex),
+        .op(alu_op_ex),
         .C(C),
         .f(f)
       );
 
+wire [31:0]C_mem;
+wire [31:0]rD2_mem;
+wire rf_wsel_mem;
+wire ram_we_mem;
+
+EX ex_mem(
+.clk_i(cpu_clk),
+.rst_i(cpu_rst),
+.aluc_i(C),
+.rD2_i(rD2_ex),
+.rf_wsel_i(rf_wsel_ex),
+.ram_we_i(ram_we_ex),
+.aluc_o(C_mem),
+.rD2_o(rD2_mem),
+.rf_wsel_o(rf_wsel_mem),
+.ram_we_o(ram_we_mem)
+    );
+    
+wire [31:0] rdo_rb;
+wire [1:0]rf_wsel_rb;   
+MEM mem_rb(
+.clk_i(cpu_clk),
+.rst_i(cpu_rst),
+.rdo_i(rdo),
+.rdo_o(rdo_rb)
+);
+
+
   MUX2 U_mux2_a(
-         .i1(pc),
+         .i1(pc_id),
          .i2(rD1),
          .o(A),
          .sel(alua_sel)
@@ -114,19 +190,19 @@ module myCPU (
        );
 
   MUX4 U_mux4_rf(
-         .i1(rdo),
-         .i2(pc4),
+         .i1(rdo_rb),
+         .i2(pc4_id),
          .i3(C),
          .i4(ext),
-         .op(rf_wsel),
+         .op(rf_wsel_rb),
          .o(wD)
        );
 
 
   CONTROLER U_controler(
-              .opcode(inst[6:0]),
-              .funct3(inst[14:12]),
-              .funct7(inst[31:25]),
+              .opcode(inst_id[6:0]),
+              .funct3(inst_id[14:12]),
+              .funct7(inst_id[31:25]),
               .npc_op(npc_op),
               .rf_wsel(rf_wsel),
               .ram_we(ram_we),
@@ -137,14 +213,12 @@ module myCPU (
               .rf_we(rf_we)
             );
 
-//`ifdef RUN_TRACE
-  assign inst_addr=pc[15:2];
-//`else
-  //assign inst_addr=pc[15:0];
-//`endif
 
-  assign Bus_wdata=rD2;
-  assign Bus_wen=ram_we;
+  assign inst_addr=pc[15:2];
+
+
+  assign Bus_wdata=rD2_mem;
+  assign Bus_wen=ram_we_mem;
 
 `ifdef RUN_TRACE
   // Debug Interface
