@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2023/07/05 15:04:30
+// Create Date: 2023/07/19 21:47:06
 // Design Name: 
-// Module Name: MUX2
+// Module Name: LED
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,11 +20,20 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module MUX2(
-input [31:0]i1,
-input [31:0]i2,
-input sel,
-output [31:0]o
+module LED(
+    input  clk_i,
+    input rst_i,
+    input wen,
+    input [11:0] addr,
+    input [31:0] wdata,
+    output reg [23:0] led
     );
-    assign o=sel?i1:i2;
+    always @ (posedge clk_i or posedge rst_i) begin
+        if(rst_i) 
+            led<=0;
+        else if(wen&&addr=='h060) 
+            led<={wdata[23:0]};
+        else 
+            led<=led;
+    end
 endmodule

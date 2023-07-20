@@ -11,7 +11,7 @@ module ALU(
   );
   reg [7:0] sel;
   /*
-  译码器，待实现
+  译码器，待实�?
   assign op_add_1=xxx
   assign op_add_2=xxx
   */
@@ -81,6 +81,8 @@ module ALU(
         //C={A[31],C[30:0]};
         C=( { {31{A[31]}}, 1'b0 } << (~B[4:0]) ) | ( A >> B[4:0] ) ;
       //C= ( {32{A[31]}} << ( 6'd32 - {1'b0, B[4:0]} ) ) | ( A >> B[4:0] ) ;
+      default:
+      C=C;
     endcase
   end
 

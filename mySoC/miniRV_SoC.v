@@ -21,11 +21,11 @@ module miniRV_SoC (
 
 `ifdef RUN_TRACE
     ,// Debug Interface
-    output wire         debug_wb_have_inst, // 当前时钟周期是否有指令写回 (对单周期CPU，可在复位后恒置1)
-    output wire [31:0]  debug_wb_pc,        // 当前写回的指令的PC (若wb_have_inst=0，此项可为任意值)
-    output              debug_wb_ena,       // 指令写回时，寄存器堆的写使能 (若wb_have_inst=0，此项可为任意值)
-    output wire [ 4:0]  debug_wb_reg,       // 指令写回时，写入的寄存器号 (若wb_ena或wb_have_inst=0，此项可为任意值)
-    output wire [31:0]  debug_wb_value      // 指令写回时，写入寄存器的值 (若wb_ena或wb_have_inst=0，此项可为任意值)
+    output wire         debug_wb_have_inst, // 当前时钟周期是否有指令写�? (对单周期CPU，可在复位后恒置1)
+    output wire [31:0]  debug_wb_pc,        // 当前写回的指令的PC (若wb_have_inst=0，此项可为任意�??)
+    output              debug_wb_ena,       // 指令写回时，寄存器堆的写使能 (若wb_have_inst=0，此项可为任意�??)
+    output wire [ 4:0]  debug_wb_reg,       // 指令写回时，写入的寄存器�? (若wb_ena或wb_have_inst=0，此项可为任意�??)
+    output wire [31:0]  debug_wb_value      // 指令写回时，写入寄存器的�? (若wb_ena或wb_have_inst=0，此项可为任意�??)
 `endif
 );
 
@@ -37,7 +37,7 @@ module miniRV_SoC (
 `ifdef RUN_TRACE
     wire [15:0] inst_addr;
 `else
-    wire [13:0] inst_addr;
+  wire [13:0] inst_addr;
 `endif
     wire [31:0] inst;
 
@@ -56,9 +56,35 @@ module miniRV_SoC (
     wire [31:0]  wdata_bridge2dram;
     
     // Interface between bridge and peripherals
-    // TODO: 在此定义总线桥与外设I/O接口电路模块的连接信号
+    // TODO: 在此定义总线桥与外设I/O接口电路模块的连接信�?
     //
-    
+     // Interface to 7-seg digital LEDs
+        wire rst_bridge2dig;
+        wire clk_bridge2dig;
+        wire [11:0] addr_bridge2dig;
+         wire wen_bridge2dig;
+         wire [31:0] wdata_bridge2dig;
+ 
+
+        // Interface to LEDs
+       wire rst_bridge2led;
+        wire clk_bridge2led;
+        wire [11:0] addr_bridge2led;
+         wire wen_bridge2led;
+        wire [31:0]wdata_bridge2led;
+
+        // Interface to switches
+       wire rst_bridge2sw;
+        wire clk_bridge2sw;
+        wire [11:0] addr_bridge2sw;
+        wire [31:0]rdata_bridge2sw;
+
+        // Interface to buttons
+       wire rst_bridge2btn;
+        wire clk_bridge2btn;
+        wire [11:0] addr_bridge2btn;
+        wire [31:0]rdata_bridge2btn;
+
 
     
 `ifdef RUN_TRACE
@@ -121,36 +147,38 @@ module miniRV_SoC (
         .wen_to_dram        (wen_bridge2dram),
         .wdata_to_dram      (wdata_bridge2dram),
         
-        // Interface to 7-seg digital LEDs
-        .rst_to_dig         (/* TODO */),
-        .clk_to_dig         (/* TODO */),
-        .addr_to_dig        (/* TODO */),
-        .wen_to_dig         (/* TODO */),
-        .wdata_to_dig       (/* TODO */),
+         // Interface to 7-seg digital LEDs
+        .rst_to_dig         (rst_bridge2dig),
+        .clk_to_dig         (clk_bridge2dig),
+        .addr_to_dig        (addr_bridge2dig),
+        .wen_to_dig         (wen_bridge2dig),
+        .wdata_to_dig       (wdata_bridge2dig),
 
         // Interface to LEDs
-        .rst_to_led         (/* TODO */),
-        .clk_to_led         (/* TODO */),
-        .addr_to_led        (/* TODO */),
-        .wen_to_led         (/* TODO */),
-        .wdata_to_led       (/* TODO */),
+        .rst_to_led         (rst_bridge2led),
+        .clk_to_led         (clk_bridge2led),
+        .addr_to_led        (addr_bridge2led),
+        .wen_to_led         (wen_bridge2led),
+        .wdata_to_led       (wdata_bridge2led),
 
         // Interface to switches
-        .rst_to_sw          (/* TODO */),
-        .clk_to_sw          (/* TODO */),
-        .addr_to_sw         (/* TODO */),
-        .rdata_from_sw      (/* TODO */),
+        .rst_to_sw          (rst_bridge2sw),
+        .clk_to_sw          (clk_bridge2sw),
+        .addr_to_sw         (addr_bridge2sw),
+        .rdata_from_sw      (rdata_bridge2sw),
 
         // Interface to buttons
-        .rst_to_btn         (/* TODO */),
-        .clk_to_btn         (/* TODO */),
-        .addr_to_btn        (/* TODO */),
-        .rdata_from_btn     (/* TODO */)
+        .rst_to_btn         (rst_bridge2btn),
+        .clk_to_btn         (clk_bridge2btn),
+        .addr_to_btn        (addr_bridge2btn),
+        .rdata_from_btn     (rdata_bridge2btn)
     );
 
+    //wire [13:0] waddr_tmp = addr_bridge2dram[15:2] - 16'h4000;
+    wire [15:0] waddr_tmp = addr_bridge2dram[15:0] - 16'h4000;
     DRAM Mem_DRAM (
         .clk        (clk_bridge2dram),
-        .a          (addr_bridge2dram[15:2]),
+        .a          (waddr_tmp[15:2]),
         .spo        (rdata_dram2bridge),
         .we         (wen_bridge2dram),
         .d          (wdata_bridge2dram)
@@ -158,6 +186,40 @@ module miniRV_SoC (
     
     // TODO: 在此实例化你的外设I/O接口电路模块
     //
+    DIG8 U_dig(
+            .clk_i(clk_bridge2dig),
+            .rst_i(rst_bridge2dig),
+            .addr(addr_bridge2dig),
+            .wdata(wdata_bridge2dig),
+            .wen(wen_bridge2dig),
+            .dig_en(dig_en),
+            .dig_data({DN_A,DN_B,DN_C,DN_D,DN_E,DN_F,DN_G,DN_DP})
+        );
+    
+    LED U_leds(
+        .clk_i(clk_bridge2led),
+        .rst_i(rst_bridge2led),
+        .wen(wen_bridge2led),
+        .addr(addr_bridge2led),
+        .wdata(wdata_bridge2led),
+        .led(led)
+    );
+    
+    SWITCHES U_sw(
+    .clk_i(clk_bridge2sw),
+    .rst_i(rst_bridge2sw),
+    .addr(addr_bridge2sw),
+    .rdata(rdata_bridge2sw),
+    .data_sw(switches)
+    );
+    
+    BUTTON U_btn(
+    .clk_i(clk_bridge2btn),
+    .rst_i(rst_bridge2btn),
+    .addr(addr_bridge2btn),
+    .rdata(rdata_bridge2btn),
+    .btn(button)
+    );
 
 
 endmodule

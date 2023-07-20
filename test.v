@@ -16,17 +16,10 @@ module myCPU (
     output wire         Bus_wen,
     output wire [31:0]  Bus_wdata
 
-`ifdef RUN_TRACE
-    ,// Debug Interface
-    output wire         debug_wb_have_inst,
-    output wire [31:0]  debug_wb_pc,
-    output              debug_wb_ena,
-    output wire [ 4:0]  debug_wb_reg,
-    output wire [31:0]  debug_wb_value
-`endif
+
   );
 
-  // TODO: ÕÍ≥…ƒ„◊‘º∫µƒµ•÷‹∆⁄CPU…Ëº∆
+  // TODO: ÁÄπÂ±æÂûöÊµ£Áä∫ÂöúÂÆ∏Ëæ©ÊÆëÈçóÊõûÊáÜÈèàÁÉ†PUÁíÅÊçêÓÖ∏
   //
   wire [31:0]npc2pc;
   wire [31:0]rD2;
@@ -55,16 +48,20 @@ module myCPU (
   wire alub_sel;
 
 
+  wire [31:0]npc_if;
+  wire [31:0]pc4_id;
+  wire [31:0]inst_id;
+  wire [31:0]pc_id;
+  wire [31:0]npc_id;
 
-
-  PC U_PC(
+  PC myPC(
        .din(npc2pc),
        .clk_i(cpu_clk),
        .rst_i(cpu_rst),
        .pc(pc)
      );
 
-  NPC U_NPC(
+  NPC myNPC(
         .pc(pc),
         .offset(ext),
         .br(f),
@@ -73,13 +70,26 @@ module myCPU (
         .npc(npc2pc),
         .pc4(pc4));
 
-  SEXT U_sext(
+  IF if_id(
+       .clk_i(cpu_clk),
+       .rst_i(cpu_rst),
+       .pc4_i(pc4),
+       .inst_i(inst),
+       .pc_i(pc),
+       .npc_i(npc_if),
+       .pc4_o(pc4_id),
+       .inst_o(inst_id),
+       .pc_o(pc_id),
+       .npc_o(npc_id)
+     );
+
+  SEXT sext(
          .op(sext_op),
          .din(inst[31:7]),
          .ext(ext)
        );
 
-  RF U_rf(
+  RF rf(
        .rR1(inst[19:15]),
        .rR2(inst[24:20]),
        .wR(inst[11:7]),
@@ -91,7 +101,7 @@ module myCPU (
        .rD2(rD2)
      );
 
-  ALU U_alu(
+  ALU alu(
         .A(A),
         .B(B),
         .op(alu_op),
@@ -99,21 +109,21 @@ module myCPU (
         .f(f)
       );
 
-  MUX2 U_mux2_a(
+  MUX2 alua(
          .i1(pc),
          .i2(rD1),
          .o(A),
          .sel(alua_sel)
        );
 
-  MUX2 U_mux2_b(
+  MUX2 alub(
          .i1(ext),
          .i2(rD2),
          .o(B),
          .sel(alub_sel)
        );
 
-  MUX4 U_mux4_rf(
+  MUX4 mux4rf(
          .i1(rdo),
          .i2(pc4),
          .i3(C),
@@ -123,7 +133,7 @@ module myCPU (
        );
 
 
-  CONTROLER U_controler(
+  CONTROLER controler(
               .opcode(inst[6:0]),
               .funct3(inst[14:12]),
               .funct7(inst[31:25]),
@@ -137,22 +147,12 @@ module myCPU (
               .rf_we(rf_we)
             );
 
-//`ifdef RUN_TRACE
-  assign inst_addr=pc[15:2];
-//`else
-  //assign inst_addr=pc[15:0];
-//`endif
+
+  assign inst_addr=pc_id[15:0];
+
 
   assign Bus_wdata=rD2;
   assign Bus_wen=ram_we;
 
-`ifdef RUN_TRACE
-  // Debug Interface
-  assign debug_wb_have_inst = 1;
-  assign debug_wb_pc        = pc;
-  assign debug_wb_ena       = rf_we;
-  assign debug_wb_reg       = inst[11:7];
-  assign debug_wb_value     = wD;
-`endif
 
 endmodule
