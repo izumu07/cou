@@ -38,14 +38,12 @@ output reg [31:0]pc_o
         pc4_o<=0;
         inst_o<=0;
         pc_o<=0;
-        npc_o<=0;
     end
     else
     begin
         pc4_o<=pc4_i;
         inst_o<=inst_i;
         pc_o<=pc_i;
-        npc_o<=npc_i;
     end
     end
 endmodule
