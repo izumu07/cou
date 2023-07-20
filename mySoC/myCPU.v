@@ -149,7 +149,7 @@ wire [31:0]rD2_ex;
 
 wire [31:0]C_mem;
 wire [31:0]rD2_mem;
-wire rf_wsel_mem;
+wire [1:0]rf_wsel_mem;
 wire ram_we_mem;
 
 EX ex_mem(
@@ -167,11 +167,15 @@ EX ex_mem(
     
 wire [31:0] rdo_rb;
 wire [1:0]rf_wsel_rb;   
+
+
 MEM mem_rb(
 .clk_i(cpu_clk),
 .rst_i(cpu_rst),
 .rdo_i(rdo),
-.rdo_o(rdo_rb)
+.rf_wsel_mem(rf_wsel_mem),
+.rdo_o(rdo_rb),
+.rf_wsel_rb(rf_wsel_rb)
 );
 
 
