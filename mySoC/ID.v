@@ -23,6 +23,8 @@
 module ID(
 input clk_i,
 input rst_i,
+input pause,
+input flush,
 
 input [31:0]pc_i,
 input [1:0]npc_op_i,
@@ -85,6 +87,42 @@ end
         alu_op_o<=0;
         alua_o<=0;
         alub_o<=0;
+        
+        ext_o<=0;
+        rD2_o<=0;
+    end
+    else if(pause)
+    begin
+            pc_o<=pc_o;
+        npc_op_o<=npc_op_o;
+        
+        ram_we_o<=ram_we_o;
+        
+        wR_o<=wR_o;
+        rf_wsel_o<=rf_wsel_o;
+        rf_we_o<=rf_we_o;
+        
+        alu_op_o<=alu_op_o;
+        alua_o<=alua_o;
+        alub_o<=alub_o;
+        
+        ext_o<=ext_o;
+        rD2_o<=rD2_o;
+    end
+        else if(flush)
+    begin
+            pc_o<=0;
+        npc_op_o<=0;
+        
+        ram_we_o<=0;
+        
+        wR_o<=0;
+        rf_wsel_o<=0;
+        rf_we_o<=0;
+        
+        alu_op_o<=0;
+        alua_o<=0;
+        alub_o<=alub_o;
         
         ext_o<=0;
         rD2_o<=0;

@@ -23,6 +23,7 @@
 module EX(
 input clk_i,
 input rst_i,
+input pause,
 
 input [31:0] aluc_i,
 input [31:0]rD2_i,
@@ -62,6 +63,19 @@ always@(posedge clk_i or posedge rst_i)
         rf_we_o<=0;
         
         ram_we_o<=0;
+    end
+    else if(pause)
+    begin
+        aluc_o<=aluc_o;
+        rD2_o<=rD2_o;
+        ext_o<=ext_o;
+        pc4_o<=pc4_o;
+        
+        wR_o<=wR_o;
+        rf_wsel_o<=rf_wsel_o;
+        rf_we_o<=rf_we_o;
+        
+        ram_we_o<=ram_we_o;
     end
     else
     begin

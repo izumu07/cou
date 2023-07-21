@@ -23,6 +23,7 @@
 module MEM(
 input clk_i,
 input rst_i,
+input pause,
 
 input [31:0]wD_i,
 input [4:0]wR_i,
@@ -40,6 +41,12 @@ output reg rf_we_o
         wD_o<=0;
         wR_o<=0;
         rf_we_o<=0;
+    end
+    else if(pause)
+    begin
+        wD_o<=wD_o;
+        wR_o<=wR_o;
+        rf_we_o<=rf_we_o;
     end
     else
     begin

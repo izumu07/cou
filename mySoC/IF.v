@@ -23,6 +23,8 @@
 module IF(
 input clk_i,
 input rst_i,
+input pause,
+input flush,
 
 input [31:0]inst_i,
 input [31:0]pc_i,
@@ -46,6 +48,16 @@ end
     always@(posedge clk_i or posedge rst_i)
     begin
     if(rst_i||~temp_rst)
+    begin
+        inst_o<=0;
+        pc_o<=0;
+    end
+    else if(pause)
+    begin
+        inst_o<=inst_o;
+        pc_o<=pc_o;
+    end
+     else if(flush)
     begin
         inst_o<=0;
         pc_o<=0;

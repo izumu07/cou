@@ -1,10 +1,10 @@
 // Annotate this macro before synthesis
 `define RUN_TRACE
 
-// TODO: ï¿½Ú´Ë´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äºï¿½
+// TODO: ÔÚ´Ë´¦¶¨ÒåÄãµÄºê
 // 
 
-// ï¿½ï¿½ï¿½ï¿½I/Oï¿½Ó¿Úµï¿½Â·ï¿½Ä¶Ë¿Úµï¿½??
+// ÍâÉèI/O½Ó¿ÚµçÂ·µÄ¶Ë¿ÚµØ??
 `define PERI_ADDR_DIG   32'hFFFF_F000
 `define PERI_ADDR_LED   32'hFFFF_F060
 `define PERI_ADDR_SW    32'hFFFF_F070

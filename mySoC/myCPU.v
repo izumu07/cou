@@ -26,7 +26,7 @@ module myCPU (
 `endif
   );
 
-  // TODO: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½CPUï¿½ï¿½ï¿½
+  // TODO: Íê³ÉÄã×Ô¼ºµÄµ¥ÖÜÆÚCPUÉè¼Æ
   //
   
  
@@ -35,20 +35,20 @@ module myCPU (
   
   
 
-  wire [31:0]ext_rb;
-  wire[31:0]C_rb;
-  wire f_rb;
 
+  wire pause;
+  
+  wire pause_ex;
+  wire pause_mem;
+  wire pause_rb;
+
+  
   
 
 
   
-  
 
-
-  
-
-  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡Ö¸ï¿½ï¿½Ôª  IFï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  //£¡£¡£¡È¡Ö¸µ¥Ôª  IF£¡£¡£¡
   wire [31:0]pc4;
   wire [31:0]pc;
   
@@ -58,10 +58,15 @@ module myCPU (
   wire [31:0]inst_id;
   
   
+  wire [31:0]npc;
+  assign npc=flush?npc2pc:(pause?pc:pc4);
+    
+  wire flush;
 
 
+  
   PC U_PC(
-       .din(pc4),
+       .din(npc),
        .clk_i(cpu_clk),
        .rst_i(cpu_rst),
        .pc(pc)
@@ -72,20 +77,23 @@ module myCPU (
   IF U_if2id(
        .clk_i(cpu_clk),
        .rst_i(cpu_rst),
+       .pause(pause|flist[4]),
+       .flush(0),
+       
        .inst_i(inst),
        .pc_i(pc),
        .inst_o(inst_id),
        .pc_o(pc_id)
      );
 
-  assign inst_addr=pc[15:2];    //ï¿½ï¿½ï¿½ï¿½iromÈ¡Ö·
+  assign inst_addr=pc[15:2];    //´«ÈëiromÈ¡Ö·
 
-  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ëµ¥Ôª IDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  //£¡£¡£¡ÒëÂëµ¥Ôª ID£¡£¡£¡
   
   
     
-  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½Ôª 
-  /* verilator lint_off UNOPTFLAT */ 
+  //Á¢¼´ÊýÍØÕ¹µ¥Ôª  
+  /* verilator lint_off UNOPTFLAT */
   wire [31:0]ext;
   /* verilator lint_off UNOPTFLAT */
   
@@ -97,18 +105,18 @@ module myCPU (
          .ext(ext)
        );
        
-  //RFÐ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½Ø½×¶Î£ï¿½ï¿½ï¿½ ï¿½ï¿½Ç°Ö¸ï¿½ï¿½ï¿½Ð´ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½Ýºï¿½Ð´Ê¹ï¿½ï¿½
+  //RFÐ´²Ù×÷£¨Ð´»Ø½×¶Î£©£º ÏÈÇ°Ö¸ÁîµÄÐ´¼Ä´æÆ÷¡¢Ð´Êý¾ÝºÍÐ´Ê¹ÄÜ
   wire [4:0]wR_rb;
   wire [31:0]wD_rb;
   wire rf_we_rb;
   
-  //RFï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¶ï¿½
+  //RF¶Á²Ù×÷ £º´«ÈëºóÐø½×¶Î
   wire [31:0]rD1;
   wire [31:0]rD2;
   
   
   
-  //ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½
+  //¼Ä´æÆ÷×é
   RF U_rf(
        .rR1(inst_id[19:15]),
        .rR2(inst_id[24:20]),
@@ -123,14 +131,14 @@ module myCPU (
        .rst_i(cpu_rst)
      );
   
-  //ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½×¶ï¿½ï¿½ÅºÅ£ï¿½ï¿½ï¿½Ç°Ö¸ï¿½ï¿½ï¿½Ð´ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ð´Ê¹ï¿½Ü£ï¿½ 
+  //´«ÈëÖ®ºó½×¶ÎÐÅºÅ£¨µ±Ç°Ö¸ÁîµÄÐ´¼Ä´æÆ÷¡¢Ð´Ê¹ÄÜ£© 
   wire [4:0]wR;
   assign wR=inst_id[11:7];
   
 
   
   
-  //ï¿½ï¿½ï¿½Æµï¿½Ôª
+  //¿ØÖÆµ¥Ôª
   wire [1:0]npc_op;
   
   wire alua_sel;
@@ -177,7 +185,7 @@ module myCPU (
               .rf_we(rf_we)  
             );
   
-  //ï¿½ï¿½È¡ALUï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½B
+  //ÇóÈ¡ALUÊäÈëAºÍB
   wire [31:0] A;
   wire [31:0] B;
   
@@ -198,6 +206,8 @@ module myCPU (
   ID U_id2ex(
        .clk_i(cpu_clk),
        .rst_i(cpu_rst),
+       .pause(pause_ex||flist[3]),
+       .flush(0),
        
        .pc_i(pc_id),
        .npc_op_i(npc_op),
@@ -232,7 +242,7 @@ module myCPU (
        .rD2_o(rD2_ex)
      );
      
-  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ðµï¿½Ôª EXï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  //£¡£¡£¡Ö´ÐÐµ¥Ôª EX£¡£¡£¡
 
   wire [31:0]C_mem;
   wire [31:0] C;
@@ -271,6 +281,7 @@ module myCPU (
   EX U_ex2mem(
        .clk_i(cpu_clk),
        .rst_i(cpu_rst),
+       .pause(pause_mem|flist[2]),
        
        .aluc_i(C),
        .rD2_i(rD2_ex),
@@ -297,11 +308,11 @@ module myCPU (
      );
   
   
-  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´æµ¥Ôª MEMï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  //£¡£¡£¡·Ã´æµ¥Ôª MEM£¡£¡£¡
   wire [31:0] rdo_rb;
   wire [1:0]rf_wsel_rb;
 
-  //ï¿½ï¿½DRAM
+  //¶ÁDRAM
   wire [31:0]rdo;
   assign rdo=Bus_rdata;
   
@@ -325,6 +336,7 @@ module myCPU (
   MEM U_mem2rb(
         .clk_i(cpu_clk),
         .rst_i(cpu_rst),
+        .pause(pause_rb),
         
         .wD_i(wD),
         .wR_i(wR_mem),
@@ -336,28 +348,40 @@ module myCPU (
       );
 
 
-`ifdef RUN_TRACE
 
-reg [3:0]cnt;
-reg flag;
+    CONTROLPIPE U_ctrlp(
+      .clk_i(cpu_clk),
+      .rst_i(cpu_rst),
+ .pc_i(pc),
+.npc_i(npc2pc),
+.rs1_i(inst_id[19:15]),
+.rs2_i(inst_id[24:20]),
+.rf_we_ex(rf_we_ex),
+.rf_we_mem(rf_we_mem),
+.rf_we_rb(rf_we_rb),
+.wR_ex(wR_ex),
+.wR_mem(wR_mem),
+.wR_rb(wR_rb),
+.opc(inst_id[6:2]),
+.npc_o(),
+.pause(pause),
+.pause_ex(pause_ex),
+.pause_mem(pause_mem),
+.pause_rb(pause_rb)
 
-always @(posedge cpu_clk or posedge cpu_rst) begin
-  if (cpu_rst) begin
-    cnt<=0;
-    flag<=0;
-  end
-  else if(cnt<4)
-    begin
-      cnt<=cnt+1;
-    end
-    else if (cnt==4) begin
-      cnt<=cnt;
-      flag<=1;
-    end
-    else
-      cnt<=cnt;
-end
-`endif
+    );
+
+wire [1:0]npc_pred;
+wire [4:0]flist;
+assign npc_pred=inst[6]?inst[3:2]:2'b10;
+
+BRANCH U_brc(
+.clk_i(cpu_clk),
+.rst_i(cpu_rst),
+.pred(npc_pred),
+.flush(flush),
+.flist(flist)
+);
 
 
   
@@ -365,13 +389,22 @@ end
 
   
 
+
+
+  
+
 `ifdef RUN_TRACE
+  
+
+
   // Debug Interface
-  assign debug_wb_have_inst = flag;
-  assign debug_wb_pc        = pc-'h10;
+  assign debug_wb_have_inst = ((wR_rb!==0)&(!pause_rb));
+  assign debug_wb_pc        = pc-4;
   assign debug_wb_ena       = rf_we_rb;
   assign debug_wb_reg       = wR_rb;
   assign debug_wb_value     = wD_rb;
 `endif
 
+
 endmodule
+    
