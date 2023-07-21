@@ -11,7 +11,7 @@ module ALU(
   );
   reg [7:0] sel;
   /*
-  è¯‘ç å™¨ï¼Œå¾…å®ç?
+  ÒëÂëÆ÷£¬´ıÊµ??
   assign op_add_1=xxx
   assign op_add_2=xxx
   */
@@ -33,7 +33,7 @@ module ALU(
   */
 
   /*
-  wire op_out;        //è¾“å‡ºé€‰æ‹©
+  wire op_out;        //Êä³öÑ¡Ôñ
   wire op_sub;        
   wire add_o;
   wire sub_o;

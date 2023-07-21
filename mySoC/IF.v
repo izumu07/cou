@@ -23,25 +23,35 @@
 module IF(
 input clk_i,
 input rst_i,
-input [31:0]pc4_i,
+
 input [31:0]inst_i,
 input [31:0]pc_i,
-output reg [31:0]pc4_o,
+
 output reg [31:0]inst_o,
 output reg [31:0]pc_o
     );
+
+reg temp_rst;
+
+always@(posedge clk_i or posedge rst_i )
+begin
+    if (rst_i)
+        temp_rst<=0;
+    else if (temp_rst==0)
+        temp_rst<=1;
+    else
+        temp_rst<=1;
+end
     
     always@(posedge clk_i or posedge rst_i)
     begin
-    if(rst_i)
+    if(rst_i||~temp_rst)
     begin
-        pc4_o<=0;
         inst_o<=0;
         pc_o<=0;
     end
     else
     begin
-        pc4_o<=pc4_i;
         inst_o<=inst_i;
         pc_o<=pc_i;
     end

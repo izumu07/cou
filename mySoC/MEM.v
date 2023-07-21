@@ -23,10 +23,13 @@
 module MEM(
 input clk_i,
 input rst_i,
-input [31:0]rdo_i,
-input [1:0]rf_wsel_mem,
-output reg[31:0]rdo_o,
-output reg[1:0]rf_wsel_rb
+
+input [31:0]wD_i,
+input [4:0]wR_i,
+input rf_we_i,
+output reg[31:0]wD_o,
+output reg[4:0]wR_o,
+output reg rf_we_o
     );
     
         
@@ -34,13 +37,15 @@ output reg[1:0]rf_wsel_rb
     begin
     if(rst_i)
     begin
-        rdo_o<=0;
-        rf_wsel_rb<=0;
+        wD_o<=0;
+        wR_o<=0;
+        rf_we_o<=0;
     end
     else
     begin
-        rdo_o<=rdo_i;
-        rf_wsel_rb<=rf_wsel_mem;
+        wD_o<=wD_i;
+        wR_o<=wR_i;
+        rf_we_o<=rf_we_i;
     end
     end
 endmodule

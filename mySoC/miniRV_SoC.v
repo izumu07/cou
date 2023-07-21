@@ -21,11 +21,11 @@ module miniRV_SoC (
 
 `ifdef RUN_TRACE
     ,// Debug Interface
-    output wire         debug_wb_have_inst, // å½“å‰æ—¶é’Ÿå‘¨æœŸæ˜¯å¦æœ‰æŒ‡ä»¤å†™ï¿½? (å¯¹å•å‘¨æœŸCPUï¼Œå¯åœ¨å¤ä½åæ’ç½®1)
-    output wire [31:0]  debug_wb_pc,        // å½“å‰å†™å›çš„æŒ‡ä»¤çš„PC (è‹¥wb_have_inst=0ï¼Œæ­¤é¡¹å¯ä¸ºä»»æ„ï¿½??)
-    output              debug_wb_ena,       // æŒ‡ä»¤å†™å›æ—¶ï¼Œå¯„å­˜å™¨å †çš„å†™ä½¿èƒ½ (è‹¥wb_have_inst=0ï¼Œæ­¤é¡¹å¯ä¸ºä»»æ„ï¿½??)
-    output wire [ 4:0]  debug_wb_reg,       // æŒ‡ä»¤å†™å›æ—¶ï¼Œå†™å…¥çš„å¯„å­˜å™¨ï¿½? (è‹¥wb_enaæˆ–wb_have_inst=0ï¼Œæ­¤é¡¹å¯ä¸ºä»»æ„ï¿½??)
-    output wire [31:0]  debug_wb_value      // æŒ‡ä»¤å†™å›æ—¶ï¼Œå†™å…¥å¯„å­˜å™¨çš„ï¿½? (è‹¥wb_enaæˆ–wb_have_inst=0ï¼Œæ­¤é¡¹å¯ä¸ºä»»æ„ï¿½??)
+    output wire         debug_wb_have_inst, // µ±Ç°Ê±ÖÓÖÜÆÚÊÇ·ñÓĞÖ¸ÁîĞ´?? (¶Ôµ¥ÖÜÆÚCPU£¬¿ÉÔÚ¸´Î»ºóºãÖÃ1)
+    output wire [31:0]  debug_wb_pc,        // µ±Ç°Ğ´»ØµÄÖ¸ÁîµÄPC (Èôwb_have_inst=0£¬´ËÏî¿ÉÎªÈÎÒâ???)
+    output              debug_wb_ena,       // Ö¸ÁîĞ´»ØÊ±£¬¼Ä´æÆ÷¶ÑµÄĞ´Ê¹ÄÜ (Èôwb_have_inst=0£¬´ËÏî¿ÉÎªÈÎÒâ???)
+    output wire [ 4:0]  debug_wb_reg,       // Ö¸ÁîĞ´»ØÊ±£¬Ğ´ÈëµÄ¼Ä´æÆ÷?? (Èôwb_ena»òwb_have_inst=0£¬´ËÏî¿ÉÎªÈÎÒâ???)
+    output wire [31:0]  debug_wb_value      // Ö¸ÁîĞ´»ØÊ±£¬Ğ´Èë¼Ä´æÆ÷µÄ?? (Èôwb_ena»òwb_have_inst=0£¬´ËÏî¿ÉÎªÈÎÒâ???)
 `endif
 );
 
@@ -56,7 +56,7 @@ module miniRV_SoC (
     wire [31:0]  wdata_bridge2dram;
     
     // Interface between bridge and peripherals
-    // TODO: åœ¨æ­¤å®šä¹‰æ€»çº¿æ¡¥ä¸å¤–è®¾I/Oæ¥å£ç”µè·¯æ¨¡å—çš„è¿æ¥ä¿¡ï¿½?
+    // TODO: ÔÚ´Ë¶¨Òå×ÜÏßÇÅÓëÍâÉèI/O½Ó¿ÚµçÂ·Ä£¿éµÄÁ¬½ÓĞÅ??
     //
      // Interface to 7-seg digital LEDs
         wire rst_bridge2dig;
@@ -88,10 +88,10 @@ module miniRV_SoC (
 
     
 `ifdef RUN_TRACE
-    // Traceè°ƒè¯•æ—¶ï¼Œç›´æ¥ä½¿ç”¨å¤–éƒ¨è¾“å…¥æ—¶é’Ÿ
+    // Traceµ÷ÊÔÊ±£¬Ö±½ÓÊ¹ÓÃÍâ²¿ÊäÈëÊ±ÖÓ
     assign cpu_clk = fpga_clk;
 `else
-    // ä¸‹æ¿æ—¶ï¼Œä½¿ç”¨PLLåˆ†é¢‘åçš„æ—¶é’Ÿ
+    // ÏÂ°åÊ±£¬Ê¹ÓÃPLL·ÖÆµºóµÄÊ±ÖÓ
     assign cpu_clk = pll_clk & pll_lock;
     cpuclk Clkgen (
         // .resetn     (!fpga_rst),
@@ -184,7 +184,7 @@ module miniRV_SoC (
         .d          (wdata_bridge2dram)
     );
     
-    // TODO: åœ¨æ­¤å®ä¾‹åŒ–ä½ çš„å¤–è®¾I/Oæ¥å£ç”µè·¯æ¨¡å—
+    // TODO: ÔÚ´ËÊµÀı»¯ÄãµÄÍâÉèI/O½Ó¿ÚµçÂ·Ä£¿é
     //
     DIG8 U_dig(
             .clk_i(clk_bridge2dig),
